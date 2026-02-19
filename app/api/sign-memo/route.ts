@@ -3,6 +3,8 @@ import { createPayload, parsePayload } from '../../solana/memo';
 import crypto from 'crypto';
 import * as bip39 from 'bip39';
 
+export const dynamic = 'force-static';
+
 // Get project mnemonic from environment (server-side only)
 function getProjectMnemonic(): string {
   const mnemonic = process.env.PROJECT_MNEMONIC;
