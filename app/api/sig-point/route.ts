@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import * as bip39 from 'bip39';
 import crypto from 'crypto';
 
-export const dynamic = 'force-static';
-
 /**
  * Get project mnemonic from environment (server-side only)
  */

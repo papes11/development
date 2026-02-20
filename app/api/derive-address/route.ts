@@ -4,8 +4,6 @@ import { derivePath } from 'ed25519-hd-key';
 import * as bip39 from 'bip39';
 import nacl from 'tweetnacl';
 
-export const dynamic = 'force-static';
-
 /**
  * Get project mnemonic from environment (server-side only)
  */
