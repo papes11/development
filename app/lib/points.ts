@@ -22,6 +22,7 @@ import { getTotalPoints, getUsagePoints, getBonusPoints, addUsagePoints, getBloc
 import { getClaimablePoints, claimPointsOnBlockchain, calculateClaimPoints, type PointsData } from './claimpoint';
 import { markGiftReceived, clearGiftPoints, isEligibleForGift, getGiftStatus } from './registrationpoint';
 import { addTaskPoints, getCompletedTasks, isTaskCompleted, getTaskStats, resetAllTasks, getTasksWithStatus, TASK_POINTS_MAP, isTaskClaimed, getTasksWithClaimStatus } from './taskpoint';
+import { getReferralBonusPoints, markReferralUsed, markReferralBonusClaimed, hasUsedReferralCode, isReferralBonusClaimed, getReferralBonusStatus } from './referralbonus';
 
 // Re-export all functions for backward compatibility
 export {
@@ -55,7 +56,15 @@ export {
   resetAllTasks,
   getTasksWithStatus,
   getTasksWithClaimStatus,
-  TASK_POINTS_MAP
+  TASK_POINTS_MAP,
+  
+  // Referral Bonus Points
+  getReferralBonusPoints,
+  markReferralUsed,
+  markReferralBonusClaimed,
+  hasUsedReferralCode,
+  isReferralBonusClaimed,
+  getReferralBonusStatus
 };
 
 /**
@@ -68,22 +77,24 @@ export function calculatePoints(): PointsData {
   const taskPoints = getTaskPoints();
   const bonusPoints = getBonusPoints();
   const giftPoints = getRegistrationPoints();
+  const referralBonusPoints = getReferralBonusPoints(); // NEW: Separate referral bonus
   
-  // Total = Blockchain + Current unclaimed earnings + Gift
-  const totalPoints = blockchainPoints + usagePoints + taskPoints + bonusPoints + giftPoints;
+  // Total = Blockchain + Current unclaimed earnings + Gift + Referral Bonus
+  const totalPoints = blockchainPoints + usagePoints + taskPoints + bonusPoints + giftPoints + referralBonusPoints;
   
   // LOCKED FORMULA: CLAIMABLE = totalPoints - blockchainPoints
   const claimablePoints = Math.max(0, totalPoints - blockchainPoints);
   
   console.log('📊 Points Calculation (FINAL MODEL - DEBUG):', {
-    blockchainPoints,    // What's on blockchain
-    usagePoints,         // Current usage points
-    taskPoints,          // Current task points  
-    bonusPoints,         // Current bonus points
-    giftPoints,          // New user gift (100 pts)
-    totalPoints,         // Blockchain + unclaimed + gift
-    claimablePoints,     // Should equal: usage + task + bonus + gift
-    'EXPECTED_TOTAL': `${giftPoints} gift + ${taskPoints} tasks + ${bonusPoints} bonus + ${usagePoints} usage + ${blockchainPoints} blockchain = ${totalPoints}`
+    blockchainPoints,        // What's on blockchain
+    usagePoints,             // Current usage points
+    taskPoints,              // Current task points  
+    bonusPoints,             // Current bonus points (wallet + verify + referral count)
+    giftPoints,              // New user gift (100 pts)
+    referralBonusPoints,     // Referral code usage bonus (40 pts)
+    totalPoints,             // Blockchain + unclaimed + gift + referral bonus
+    claimablePoints,         // Should equal: usage + task + bonus + gift + referral bonus
+    'EXPECTED_TOTAL': `${giftPoints} gift + ${taskPoints} tasks + ${bonusPoints} bonus + ${usagePoints} usage + ${referralBonusPoints} referral + ${blockchainPoints} blockchain = ${totalPoints}`
   });
   
   return {

@@ -160,9 +160,13 @@ export function ClaimTab() {
       }
     }
     
-    // Track wallet connection for bonus points
+    // Track wallet connection for bonus points (ONLY ONCE - first time)
     if (publicKey) {
-      localStorage.setItem('desocial_wallet_connected', 'true');
+      const alreadyConnected = localStorage.getItem('desocial_wallet_connected');
+      if (!alreadyConnected) {
+        localStorage.setItem('desocial_wallet_connected', 'true');
+        console.log('🎉 First wallet connection - bonus eligible');
+      }
     }
 
     if (storedClaimedTasks) {

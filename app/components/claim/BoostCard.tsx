@@ -63,17 +63,6 @@ export function BoostCard({
       transition={{ delay: 0.3 }}
       className="mb-6"
     >
-      {/* Total Bonus Points Display */}
-      <div className="mb-4 p-6 backdrop-blur-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/30 rounded-2xl">
-        <div className="text-center">
-          <div className="text-sm text-gray-300 mb-2">Your Bonus Points</div>
-          <div className="text-5xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-            {totalBonusPoints.toLocaleString()}
-          </div>
-          <div className="text-xs text-gray-400 mt-2">Extra points from achievements</div>
-        </div>
-      </div>
-
       {/* Bonus Tasks */}
       <div className="space-y-2.5">
         {bonusTasks.map((task, index) => (

@@ -110,6 +110,37 @@ export async function rescanBlockchain(
     localStorage.setItem('desocial_referredby', userData.referredBy || 'null');
     localStorage.setItem('desocial_userdata', JSON.stringify(userData));
     
+    // Mark gift as claimed since user already has points on blockchain
+    localStorage.setItem('desocial_gift_claimed', 'true');
+    
+    // Mark wallet as connected (first time bonus already on blockchain)
+    localStorage.setItem('desocial_wallet_connected', 'true');
+    
+    // If user has referredBy on blockchain, mark referral as used and bonus as claimed
+    if (userData.referredBy && userData.referredBy !== 'null') {
+      localStorage.setItem('desocial_referral_used', 'true');
+      localStorage.setItem('desocial_referral_bonus_claimed', 'true');
+      localStorage.setItem('desocial_referral_code_used', userData.referredBy);
+      console.log('🎁 User has referral code on blockchain, marking bonus as claimed:', userData.referredBy);
+    }
+    
+    // IMPORTANT: Clear unclaimed points if blockchain shows they were already claimed
+    // If blockchain points > 100 (initial), it means user already claimed some points
+    if (userData.points > 100) {
+      console.log(`🧹 Blockchain shows ${userData.points} points (> 100), clearing unclaimed points`);
+      localStorage.removeItem('desocial_points_proof'); // Clear usage points
+      localStorage.setItem('desocial_achievements_claimed', 'true'); // Mark achievements as claimed
+      localStorage.setItem('desocial_referral_bonus_claimed', 'true'); // Mark referral bonus as claimed
+    } else {
+      console.log(`📊 Blockchain shows ${userData.points} points, preserving unclaimed points if any`);
+    }
+    
+    // DON'T mark achievements as claimed - user may have unclaimed bonuses
+    // They will be marked as claimed when user actually claims points
+    
+    // Preserve desocial_points_proof (unclaimed usage points) - don't clear it
+    console.log('✅ Rescan complete - preserved unclaimed points if any exist');
+    
     return {
       success: true,
       userData

@@ -79,9 +79,13 @@ export function HomeTab({ userData }: HomeTabProps) {
     const verified = storedVerification === 'true';
     setIsVerified(verified);
     
-    // Track wallet connection for bonus points
+    // Track wallet connection for bonus points (ONLY ONCE - first time)
     if (publicKey) {
-      localStorage.setItem('desocial_wallet_connected', 'true');
+      const alreadyConnected = localStorage.getItem('desocial_wallet_connected');
+      if (!alreadyConnected) {
+        localStorage.setItem('desocial_wallet_connected', 'true');
+        console.log('🎉 First wallet connection - bonus eligible');
+      }
     }
   }, [userData, publicKey]);
 

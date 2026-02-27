@@ -51,7 +51,12 @@ export async function verifyReferral(params: VerifyReferralParams): Promise<Veri
     
     // Step 1: Check user's current sig to see if they already used a referral code
     const userAddresses = await generateAddresses(userWalletAddress);
-    const userSig = await getLatestMemo(connection, userAddresses.referralAddress);
+    console.log('🔍 DEBUG - Fetching user state:', {
+      userWallet: userWalletAddress,
+      userAddress: userAddresses.referralAddress.toString()
+    });
+    
+    const userSig = await getLatestMemo(connection, userAddresses.referralAddress, userWalletAddress);
     
     if (!userSig) {
       return {
@@ -62,6 +67,15 @@ export async function verifyReferral(params: VerifyReferralParams): Promise<Veri
     
     // Decrypt user's sig
     const userState = await decryptSigFromBackend(userSig);
+    
+    console.log('🔍 DEBUG - User current state:', {
+      username: userState.u,
+      wallet: userState.w,
+      referralCode: userState.rf,
+      referredBy: userState.rb,
+      referralCount: userState.rc,
+      points: userState.p
+    });
     
     // Check if user already used a referral code
     if (userState.rb !== null) {
@@ -143,17 +157,17 @@ export async function verifyReferral(params: VerifyReferralParams): Promise<Veri
     
     console.log('Referrer verified successfully');
     
-    // Step 3: Create updated state for USER (with rb set)
+    // Step 3: Create updated state for USER (with rb set and +40 bonus points)
     const updatedUserState: UserState = {
       u: userState.u,
       w: userState.w,
       rf: userState.rf,
       rb: referralCode,  // Set rb to the referral code used
       rc: userState.rc,
-      p: userState.p
+      p: userState.p + 40  // Add 40 bonus points directly to blockchain
     };
     
-    console.log('Updated user state:', updatedUserState);
+    console.log('Updated user state (with +40 referral bonus):', updatedUserState);
     
     // Get new sig for user from backend
     console.log('Requesting new sig for user from backend...');
@@ -162,7 +176,7 @@ export async function verifyReferral(params: VerifyReferralParams): Promise<Veri
     console.log('User sig received, length:', userNewSig.length);
     const userMemoData = userNewSig;  // Just the sig, no prefix
     
-    // Step 4: Create updated state for REFERRER (with rc incremented)
+    // Step 4: Create updated state for REFERRER (with rc incremented and +50 bonus points)
     const newReferralCount = referrerState.rc + 1;
     console.log('Incrementing referral count:', referrerState.rc, '->', newReferralCount);
     
@@ -172,10 +186,10 @@ export async function verifyReferral(params: VerifyReferralParams): Promise<Veri
       rf: referrerState.rf,
       rb: referrerState.rb,
       rc: newReferralCount,
-      p: referrerState.p
+      p: referrerState.p + 50  // Add 50 bonus points for getting a referral
     };
     
-    console.log('Updated referrer state:', updatedReferrerState);
+    console.log('Updated referrer state (with +50 referral bonus):', updatedReferrerState);
     
     // Get new sig for referrer from backend
     console.log('Requesting new sig for referrer from backend...');
@@ -186,6 +200,20 @@ export async function verifyReferral(params: VerifyReferralParams): Promise<Veri
     
     // Step 5: Create ONE transaction with TWO transfers (to both addresses)
     const userPublicKey = new PublicKey(userWalletAddress);
+    
+    console.log('🔍 DEBUG - Transaction details:', {
+      userWallet: userWalletAddress,
+      userAddress: userAddresses.referralAddress.toString(),
+      referrerAddress: referrerAddress.toString(),
+      userRbBefore: userState.rb,
+      userRbAfter: updatedUserState.rb,
+      referrerRbBefore: referrerState.rb,
+      referrerRbAfter: updatedReferrerState.rb,
+      userPointsBefore: userState.p,
+      userPointsAfter: updatedUserState.p,
+      referrerRcBefore: referrerState.rc,
+      referrerRcAfter: updatedReferrerState.rc
+    });
     
     const transfers = [
       {
@@ -209,9 +237,29 @@ export async function verifyReferral(params: VerifyReferralParams): Promise<Veri
     
     console.log('Referral verification successful!');
     
-    // Update localStorage for points calculation
+    // Update localStorage - add 40 points directly to blockchain points
+    const currentBlockchainPoints = parseInt(localStorage.getItem('desocial_points') || '0', 10);
+    const newBlockchainPoints = currentBlockchainPoints + 40;
+    localStorage.setItem('desocial_points', newBlockchainPoints.toString());
+    
+    // Update user data with new points
+    const userData = localStorage.getItem('desocial_userdata');
+    if (userData) {
+      try {
+        const parsed = JSON.parse(userData);
+        parsed.points = newBlockchainPoints;
+        parsed.referredBy = referralCode;
+        localStorage.setItem('desocial_userdata', JSON.stringify(parsed));
+      } catch (error) {
+        console.error('Failed to update user data:', error);
+      }
+    }
+    
+    // Mark referral as used and bonus as claimed (since it's added directly)
     localStorage.setItem('desocial_referral_used', 'true');
-    console.log('✅ Updated localStorage: referral used');
+    localStorage.setItem('desocial_referredby', referralCode);
+    localStorage.setItem('desocial_referral_bonus_claimed', 'true'); // Already added to blockchain
+    console.log('✅ Updated localStorage: referral used, +40 points added to blockchain');
     
     // Trigger points update
     window.dispatchEvent(new CustomEvent('pointsUpdated'));

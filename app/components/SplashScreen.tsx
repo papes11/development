@@ -94,7 +94,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
           // Update total points in localStorage
           localStorage.setItem('desocial_points', signedData.total_points.toString());
           
-          // Store the newly earned points for claim tab
+          // Store the newly earned points for claim tab (ONLY if > 0)
           const pointsProof = {
             points: usageData.totalNewMinutes,
             wallet: walletAddress,
@@ -106,6 +106,8 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
           
           localStorage.setItem('desocial_points_proof', JSON.stringify(pointsProof));
           console.log(`Earned ${usageData.totalNewMinutes} new points (+${signedData.bonus_applied} bonus pts applied)`);
+        } else {
+          console.log('No new usage points to claim');
         }
         
         setLoadingText('Ready!');

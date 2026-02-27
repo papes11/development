@@ -58,6 +58,8 @@ export function claimPointsOnBlockchain(pointsToClaim: number): void {
     // STEP 4: Mark achievements and gift as claimed
     localStorage.setItem('desocial_achievements_claimed', 'true');
     localStorage.setItem('desocial_gift_claimed', 'true'); // Mark gift as claimed
+    localStorage.setItem('desocial_referral_bonus_claimed', 'true'); // Mark referral bonus as claimed
+    localStorage.setItem('desocial_referral_bonus_claimed', 'true'); // Mark referral bonus as claimed
     
     // STEP 5: Mark individual tasks as claimed (not all at once)
     const claimedTasks = JSON.parse(localStorage.getItem('desocial_claimed_tasks') || '{}');

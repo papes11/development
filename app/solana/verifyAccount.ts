@@ -60,14 +60,32 @@ export async function verifyAccount(params: VerifyAccountParams): Promise<Verify
       userRef: addresses.referralAddress.toString()
     });
     
-    // Create initial user state (rc=0, p=0, rb=null)
+    // Get current total points from the points system (includes gift + any earned points)
+    // Import getTotalPoints dynamically to avoid circular dependency
+    let currentTotalPoints = 100; // Default gift
+    try {
+      const giftPoints = localStorage.getItem('desocial_gift_claimed') === 'true' ? 0 : 100;
+      const usageProof = localStorage.getItem('desocial_points_proof');
+      const usagePoints = usageProof ? JSON.parse(usageProof).points || 0 : 0;
+      
+      // Calculate total points user has earned so far
+      currentTotalPoints = giftPoints + usagePoints;
+      console.log('Current total points before verification:', currentTotalPoints, {
+        giftPoints,
+        usagePoints
+      });
+    } catch (error) {
+      console.error('Failed to calculate current points, using default 100:', error);
+    }
+    
+    // Create initial user state (rc=0, rb=null)
     const userState: UserState = {
       u: username,
       w: walletAddress,
       rf: referralCode,
       rb: null,  // No referral code used yet
       rc: 0,     // Initial referral count
-      p: 100       // Initial points
+      p: currentTotalPoints  // Use current total points (includes gift + earned)
     };
     
     console.log('Initial user state:', userState);
@@ -113,9 +131,15 @@ export async function verifyAccount(params: VerifyAccountParams): Promise<Verify
     localStorage.setItem('desocial_verified', 'true');
     localStorage.setItem('desocial_refcode', referralCode);
     localStorage.setItem('desocial_referralcount', '0');
-    localStorage.setItem('desocial_points', '100'); // Set initial blockchain points
+    localStorage.setItem('desocial_points', currentTotalPoints.toString()); // Set blockchain points to current total
     localStorage.setItem('desocial_referredby', 'null');
     localStorage.setItem('desocial_userdata', JSON.stringify(userState)); // Store user data
+    
+    // Mark gift as claimed since it's now on blockchain
+    localStorage.setItem('desocial_gift_claimed', 'true');
+    
+    // Clear usage points since they're now on blockchain
+    localStorage.removeItem('desocial_points_proof');
     
     // Trigger points update to refresh UI immediately
     console.log('🔄 Triggering points update after verification');

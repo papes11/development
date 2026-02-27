@@ -73,6 +73,15 @@ export function ClaimButton({ pointsToClaim, onClaimSuccess }: ClaimButtonProps)
       const currentState = await decryptSigFromBackend(cleanMemo);
       
       console.log('✅ Current state decrypted:', currentState);
+      
+      // IMPORTANT: Check if points were already claimed
+      const localBlockchainPoints = parseInt(localStorage.getItem('desocial_points') || '0', 10);
+      if (currentState.p >= localBlockchainPoints + pointsToClaim) {
+        console.warn('⚠️ Points may have already been claimed on blockchain');
+        toast.error('These points appear to have already been claimed. Try rescanning your account.');
+        setIsLoading(false);
+        return;
+      }
 
       // Update points
       const updatedState: UserState = {

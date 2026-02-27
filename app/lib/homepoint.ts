@@ -166,7 +166,7 @@ export function getBonusPoints(): number {
       // Achievement bonus points (only if not yet claimed)
       const walletConnected = !!localStorage.getItem('desocial_wallet_connected');
       const accountVerified = localStorage.getItem('desocial_verified') === 'true';
-      const referralUsed = !!localStorage.getItem('desocial_referral_used');
+      // REMOVED: referralUsed bonus - now tracked separately in referralbonus.ts
       
       // Get referral count from blockchain user data (most accurate)
       let referralCount = 0;
@@ -188,16 +188,16 @@ export function getBonusPoints(): number {
       
       if (walletConnected) bonusPoints += 20;
       if (accountVerified) bonusPoints += 40;
-      if (referralUsed) bonusPoints += 40;
+      // REMOVED: if (referralUsed) bonusPoints += 40; - now in referralbonus.ts
       bonusPoints += referralCount * 50;
       
       console.log('📊 Bonus points breakdown:', {
         walletConnected: walletConnected ? 20 : 0,
         accountVerified: accountVerified ? 40 : 0,
-        referralUsed: referralUsed ? 40 : 0,
         referralCount: referralCount,
         referralPoints: referralCount * 50,
-        total: bonusPoints
+        total: bonusPoints,
+        note: 'Referral usage bonus (40pts) tracked separately in referralbonus.ts'
       });
     }
     

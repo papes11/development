@@ -4,7 +4,7 @@ import { WalletContextProvider } from './wallets/wallet-provider'
 import { Toaster } from './components/ui/sonner'
 
 export const metadata: Metadata = {
-  title: 'DeSocial UI Design Language',
+  title: 'DeSocial app',
   description: 'A modern social app built with Next.js',
 }
 
