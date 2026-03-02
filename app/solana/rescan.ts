@@ -156,6 +156,13 @@ export async function rescanBlockchain(
         
         console.log('📋 All tasks marked as completed and claimed');
       }
+      
+      // If points > 10k, mark bonus purchase as completed (user bought 10k bonus)
+      if (userData.points > 10000) {
+        console.log(`💰 Blockchain shows ${userData.points} points (> 10k), marking bonus purchase as completed`);
+        localStorage.setItem('desocial_bonus_purchased', 'true');
+        console.log('💰 Bonus purchase marked as completed');
+      }
     } else {
       console.log(`📊 Blockchain shows ${userData.points} points, preserving unclaimed points if any`);
     }

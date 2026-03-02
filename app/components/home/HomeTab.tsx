@@ -26,12 +26,10 @@ export function HomeTab({ userData }: HomeTabProps) {
   const [pointsData, setPointsData] = useState<PointsData>({ totalPoints: 100, blockchainPoints: 0, claimablePoints: 100 });
   const [apps, setApps] = useState<AppUsage[]>([
     { name: 'Instagram', icon: '/instagram.svg', todayPoints: 0, todayMinutes: 0 },
-    { name: 'WhatsApp', icon: '/whatsapp.svg', todayPoints: 0, todayMinutes: 0 },
     { name: 'X', icon: '/twitter.svg', todayPoints: 0, todayMinutes: 0 },
     { name: 'YouTube', icon: '/youtube.svg', todayPoints: 0, todayMinutes: 0 },
     { name: 'TikTok', icon: '/tiktok.svg', todayPoints: 0, todayMinutes: 0 },
     { name: 'Facebook', icon: '/facebook.svg', todayPoints: 0, todayMinutes: 0 },
-    { name: 'Telegram', icon: '/telegram.svg', todayPoints: 0, todayMinutes: 0 },
   ]);
 
   // Load usage data from native tracking (only when app opens)
