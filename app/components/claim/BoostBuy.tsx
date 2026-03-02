@@ -76,7 +76,7 @@ export function BoostBuy({ onPurchaseSuccess }: BoostBuyProps) {
       >
         <Gift className="w-5 h-5 group-hover:scale-110 transition-transform" />
         <span>
-          {hasPurchased ? 'ALREADY PURCHASED' : isLoading ? 'PURCHASING...' : 'Limited BUY'}
+          {hasPurchased ? 'BONUS PURCHASED' : isLoading ? 'PURCHASING...' : 'Limited BUY'}
         </span>
         {!hasPurchased && (
           <span className="px-2 py-0.5 bg-yellow-500/30 rounded-full text-xs font-bold">

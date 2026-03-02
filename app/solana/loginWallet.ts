@@ -117,6 +117,31 @@ export async function loginWithWallet(
       localStorage.removeItem('desocial_points_proof'); // Clear usage points
       localStorage.setItem('desocial_achievements_claimed', 'true'); // Mark achievements as claimed
       localStorage.setItem('desocial_referral_bonus_claimed', 'true'); // Mark referral bonus as claimed
+      
+      // If points > 500, mark all tasks as claimed (user has claimed task points)
+      if (userData.points > 500) {
+        console.log(`🧹 Blockchain shows ${userData.points} points (> 500), marking all tasks as claimed`);
+        
+        // Mark all possible tasks as claimed
+        const allTasksClaimed = {
+          'Follow us on X': true,
+          'Like our post': true,
+          'Repost our content': true,
+          'Comment on our post': true
+        };
+        
+        const allTasksClaimStatus = {
+          'Follow us on X': true,
+          'Like our post': true,
+          'Repost our content': true,
+          'Comment on our post': true
+        };
+        
+        localStorage.setItem('desocial_claimed_tasks', JSON.stringify(allTasksClaimed));
+        localStorage.setItem('desocial_task_claim_status', JSON.stringify(allTasksClaimStatus));
+        
+        console.log('📋 All tasks marked as completed and claimed');
+      }
     } else {
       console.log(`📊 Blockchain shows ${userData.points} points, preserving unclaimed points if any`);
     }

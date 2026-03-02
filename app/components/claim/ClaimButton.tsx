@@ -120,12 +120,46 @@ export function ClaimButton({ pointsToClaim, onClaimSuccess }: ClaimButtonProps)
       
       console.log('🎉 Claim successful! Transaction:', signature);
 
-      // Update localStorage with new total
+      // Update localStorage with new total (blockchain points)
       const newTotalPoints = (currentState.p || 0) + pointsToClaim;
       localStorage.setItem('desocial_points', newTotalPoints.toString());
+      
+      // Update user data with new points
+      const userData = localStorage.getItem('desocial_userdata');
+      if (userData) {
+        try {
+          const parsed = JSON.parse(userData);
+          parsed.points = newTotalPoints;
+          localStorage.setItem('desocial_userdata', JSON.stringify(parsed));
+        } catch (error) {
+          console.error('Failed to update user data:', error);
+        }
+      }
 
-      // Use centralized points system to update state
-      claimPointsOnBlockchain(pointsToClaim);
+      // Use centralized points system to clear unclaimed sources (but don't recalculate total)
+      // Mark achievements and gift as claimed
+      localStorage.setItem('desocial_achievements_claimed', 'true');
+      localStorage.setItem('desocial_gift_claimed', 'true');
+      localStorage.setItem('desocial_referral_bonus_claimed', 'true');
+      
+      // Mark all completed tasks as claimed
+      const claimedTasks = JSON.parse(localStorage.getItem('desocial_claimed_tasks') || '{}');
+      const taskClaimStatus = JSON.parse(localStorage.getItem('desocial_task_claim_status') || '{}');
+      
+      Object.keys(claimedTasks).forEach(taskTitle => {
+        if (claimedTasks[taskTitle]) {
+          taskClaimStatus[taskTitle] = true;
+          console.log(`📋 Marked task "${taskTitle}" as claimed`);
+        }
+      });
+      
+      localStorage.setItem('desocial_task_claim_status', JSON.stringify(taskClaimStatus));
+      
+      // Clear usage points since they're now on blockchain
+      localStorage.removeItem('desocial_points_proof');
+      
+      // Dispatch event to update all components
+      window.dispatchEvent(new CustomEvent('pointsUpdated'));
 
       toast.success(`🎉 Successfully claimed ${pointsToClaim} points on blockchain!`);
 

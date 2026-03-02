@@ -2,7 +2,7 @@ import { PublicKey } from '@solana/web3.js';
 import { getApiUrl, API_ENDPOINTS } from '../lib/apiUtils';
 
 // Hardcoded global address (safe to be public)
-const DESOCIAL_GLOBAL_ADDRESS = 'FSNCrDoTdNxaESEzp6gUzytffFPTx1qyARz8N9Wj8zs4';
+const DESOCIAL_GLOBAL_ADDRESS = '5tAGt4aFT9Eqom5DJKht3uJUsYkVq5FHHy2mrRmiFcXy';
 
 /**
  * Generate wallet substrings for address derivation

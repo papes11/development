@@ -15,6 +15,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       richColors={false}
       closeButton={false}
       offset={100} // Position above bottom navigation
+      visibleToasts={3}
       toastOptions={{
         style: {
           background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.2), rgba(126, 34, 206, 0.2))',
@@ -24,9 +25,14 @@ const Toaster = ({ ...props }: ToasterProps) => {
           color: 'rgb(196, 181, 253)',
           fontSize: '14px',
           fontWeight: '500',
-          padding: '16px',
+          padding: '12px 16px',
           boxShadow: '0 8px 32px rgba(147, 51, 234, 0.3)',
           marginBottom: '8px',
+          maxWidth: 'calc(100vw - 32px)', // Responsive width
+          width: 'auto',
+          minWidth: '280px',
+          wordBreak: 'break-word',
+          textAlign: 'center',
         },
         className: 'toast-custom',
       }}

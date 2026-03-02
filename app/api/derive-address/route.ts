@@ -33,9 +33,10 @@ function deriveFromMnemonic(mnemonic: string, seedString: string): PublicKey {
   // Convert seed string to derivation path
   const seed = bip39.mnemonicToSeedSync(mnemonic);
   
-  // Create a simple hash of the seed string for derivation
-  const seedHash = Array.from(new TextEncoder().encode(seedString))
-    .reduce((acc, byte) => acc + byte, 0) % 2147483647; // Keep within valid range
+  // Create a proper hash of the seed string for derivation
+  const crypto = require('crypto');
+  const hash = crypto.createHash('sha256').update(seedString).digest();
+  const seedHash = hash.readUInt32BE(0) % 2147483647; // Use first 4 bytes as seed
   
   const derivationPath = `m/44'/501'/${seedHash}'/0'`;
   const derivedSeed = derivePath(derivationPath, seed.toString('hex')).key;
