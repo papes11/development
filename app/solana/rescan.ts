@@ -124,54 +124,41 @@ export async function rescanBlockchain(
       console.log('🎁 User has referral code on blockchain, marking bonus as claimed:', userData.referredBy);
     }
     
-    // IMPORTANT: Clear unclaimed points if blockchain shows they were already claimed
-    // If blockchain points > 100 (initial), it means user already claimed some points
-    if (userData.points > 100) {
-      console.log(`🧹 Blockchain shows ${userData.points} points (> 100), clearing unclaimed points`);
-      localStorage.removeItem('desocial_points_proof'); // Clear usage points
-      localStorage.setItem('desocial_achievements_claimed', 'true'); // Mark achievements as claimed
-      localStorage.setItem('desocial_referral_bonus_claimed', 'true'); // Mark referral bonus as claimed
+    // IMPORTANT: Blockchain is source of truth - always mark achievements as claimed on rescan
+    // wallet_connected and verified flags are set above, but achievements_claimed must be set
+    // to prevent getBonusPoints() from double-counting them on top of blockchain points
+    localStorage.setItem('desocial_achievements_claimed', 'true');
+    localStorage.setItem('desocial_referral_bonus_claimed', 'true');
+    localStorage.removeItem('desocial_points_proof'); // Blockchain is source of truth
+    
+    if (userData.points > 500) {
+      console.log(`🧹 Blockchain shows ${userData.points} points (> 500), marking all tasks as claimed`);
       
-      // If points > 500, mark all tasks as claimed (user has claimed task points)
-      if (userData.points > 500) {
-        console.log(`🧹 Blockchain shows ${userData.points} points (> 500), marking all tasks as claimed`);
-        
-        // Mark all possible tasks as claimed
-        const allTasksClaimed = {
-          'Follow us on X': true,
-          'Like our post': true,
-          'Repost our content': true,
-          'Comment on our post': true
-        };
-        
-        const allTasksClaimStatus = {
-          'Follow us on X': true,
-          'Like our post': true,
-          'Repost our content': true,
-          'Comment on our post': true
-        };
-        
-        localStorage.setItem('desocial_claimed_tasks', JSON.stringify(allTasksClaimed));
-        localStorage.setItem('desocial_task_claim_status', JSON.stringify(allTasksClaimStatus));
-        
-        console.log('📋 All tasks marked as completed and claimed');
-      }
+      const allTasksClaimed = {
+        'Follow us on X': true,
+        'Like our post': true,
+        'Repost our content': true,
+        'Comment on our post': true
+      };
       
-      // If points > 10k, mark bonus purchase as completed (user bought 10k bonus)
-      if (userData.points > 10000) {
-        console.log(`💰 Blockchain shows ${userData.points} points (> 10k), marking bonus purchase as completed`);
-        localStorage.setItem('desocial_bonus_purchased', 'true');
-        console.log('💰 Bonus purchase marked as completed');
-      }
-    } else {
-      console.log(`📊 Blockchain shows ${userData.points} points, preserving unclaimed points if any`);
+      const allTasksClaimStatus = {
+        'Follow us on X': true,
+        'Like our post': true,
+        'Repost our content': true,
+        'Comment on our post': true
+      };
+      
+      localStorage.setItem('desocial_claimed_tasks', JSON.stringify(allTasksClaimed));
+      localStorage.setItem('desocial_task_claim_status', JSON.stringify(allTasksClaimStatus));
+      console.log('📋 All tasks marked as completed and claimed');
     }
     
-    // DON'T mark achievements as claimed - user may have unclaimed bonuses
-    // They will be marked as claimed when user actually claims points
+    if (userData.points > 10000) {
+      console.log(`💰 Blockchain shows ${userData.points} points (> 10k), marking bonus purchase as completed`);
+      localStorage.setItem('desocial_bonus_purchased', 'true');
+    }
     
-    // Preserve desocial_points_proof (unclaimed usage points) - don't clear it
-    console.log('✅ Rescan complete - preserved unclaimed points if any exist');
+    console.log('✅ Rescan complete - blockchain is source of truth, achievements marked as claimed');
     
     return {
       success: true,

@@ -52,10 +52,10 @@ function getProjectMnemonic(mnemonicArg) {
   }
 
   const envContent = fs.readFileSync(envPath, 'utf8');
-  const match = envContent.match(/NEXT_PUBLIC_PROJECT_MNEMONIC=(.+)/);
+  const match = envContent.match(/PROJECT_MNEMONIC=(.+)/);
   
   if (!match || !match[1]) {
-    throw new Error('NEXT_PUBLIC_PROJECT_MNEMONIC not found in .env.local');
+    throw new Error('PROJECT_MNEMONIC not found in .env.local');
   }
 
   const mnemonic = match[1].trim();
