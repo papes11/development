@@ -15,6 +15,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <meta name="base:app_id" content="69cca69d97b57b2203048707" />
+      </head>
       <body>
         <WalletContextProvider>
           {children}
